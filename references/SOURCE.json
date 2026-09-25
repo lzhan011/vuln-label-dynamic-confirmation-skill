@@ -1,0 +1,42 @@
+{
+  "synced_utc": "2026-09-25T08:13:15Z",
+  "note": "references/ are English translations of the Chinese originals listed here (path relative to the source repository root, sha256 and size of the Chinese original at translation time). Inside the source repository the original wins on any conflict; scripts/sync_references.sh re-copies the originals.",
+  "files": {
+    "BIGVUL_LOOP_PROMPT.md": {
+      "source": "tasks/bigvul_reports/BIGVUL_LOOP_PROMPT.md",
+      "sha256": "98d2ff01cfd9d7df5057ff3f55d9755660b26ca7a6aa68d5caf884e07a71be5e",
+      "bytes": 134910
+    },
+    "PRIMEVUL_LOOP_PROMPT.md": {
+      "source": "tasks/primevul_reports/LOOP_PROMPT.md",
+      "sha256": "42e4ab5a4d43ad2f30467ea829b6b5196b3b6f769454f0eed7fbff19516f7bb7",
+      "bytes": 70163
+    },
+    "MEGAVUL_LOOP_PROMPT.md": {
+      "source": "tasks/megavul_reports/LOOP_PROMPT.md",
+      "sha256": "e2e34749482c8fe1d09a5e14f9e9ffd57450753bcb49756b605971c71b001853",
+      "bytes": 120468
+    },
+    "DIVERSEVUL_LOOP_PROMPT.md": {
+      "source": "tasks/diversevul_reports/LOOP_PROMPT.md",
+      "sha256": "9f12b7174a4432c98bb1f862d60e3ba6d213f364a72618e38276a373e1b8b81f",
+      "bytes": 51343
+    },
+    "PROJECT_AGENT_BRIEF.md": {
+      "source": "tasks/bigvul_reports/evidence_repair/PROJECT_AGENT_BRIEF.md",
+      "sha256": "70cd971c686580ffd8017413f957c8fac97e83b49a1f30f2c069d7fbd0d01f0e",
+      "bytes": 21652
+    },
+    "CONFIRMATION_SCOPE.md": {
+      "source": "tasks/bigvul_reports/evidence_repair/CONFIRMATION_SCOPE.md",
+      "sha256": "ecd399378d390990516a91249de2abdec9d84cd9f1bb5395c994cfbcf3561728",
+      "bytes": 6890
+    },
+    "primevul_outcome_taxonomy.py": {
+      "source": "tasks/primevul_reports/primevul_outcome_taxonomy.py",
+      "sha256": "25891173d37abcf2e87874296053e0b7b653b94a1d1563728a554d9bfad463e4",
+      "bytes": 40465
+    }
+  },
+  "translated": "2026-09-25"
+}
