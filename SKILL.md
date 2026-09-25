@@ -1,7 +1,7 @@
 ---
 name: vuln-label-dynamic-confirmation
 description: Operating manual for verifying vulnerability labels with dynamic tools across the BigVul, PrimeVul, MegaVul and DiverseVul datasets and any project. Load it before any task that confirms a sample under data/output/dataset/<dataset>/<id> dynamically, decides label noise, repairs evidence, writes dynamic_confirmation.json or craft.json, runs the sign-off checkers, refreshes the statistics reports, or performs a manual spot-check review. It compresses the criteria shared by the four LOOP_PROMPT documents (the four outcomes, the two-sided differential, attribution, the seven gates, evidence self-sufficiency, banned wording) into executable steps, and lists per-dataset paths, fields and quirks in one parameter table. The full long-form prompts live in references/; when they disagree with this file, the dataset's own long-form prompt wins.
-license: All rights reserved. Research artifact published for reference; see README.md.
+license: MIT (see LICENSE)
 metadata:
   skill_version: 2026-09-25
   canonical_sources: tasks/bigvul_reports/BIGVUL_LOOP_PROMPT.md, tasks/primevul_reports/LOOP_PROMPT.md, tasks/megavul_reports/LOOP_PROMPT.md, tasks/diversevul_reports/LOOP_PROMPT.md, CLAUDE.md
