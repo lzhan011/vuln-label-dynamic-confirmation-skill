@@ -1,0 +1,96 @@
+cff-version: 1.2.0
+message: "If you use this skill, please cite it as below."
+title: "vuln-label-dynamic-confirmation: an Agent Skill for dynamic-tool verification of vulnerability labels"
+type: software
+authors:
+  - name: "lzhan011"
+year: 2026
+date-released: "2026-09-25"
+license: MIT
+repository-code: "https://github.com/lzhan011/vuln-label-dynamic-confirmation-skill"
+url: "https://github.com/lzhan011/vuln-label-dynamic-confirmation-skill"
+keywords:
+  - vulnerability detection
+  - label noise
+  - dynamic analysis
+  - sanitizers
+  - BigVul
+  - PrimeVul
+  - MegaVul
+  - DiverseVul
+  - agent skills
+references:
+  - type: conference-paper
+    title: "A C/C++ Code Vulnerability Dataset with Code Changes and CVE Summaries"
+    authors:
+      - family-names: Fan
+        given-names: Jiahao
+      - family-names: Li
+        given-names: Yi
+      - family-names: Wang
+        given-names: Shaohua
+      - family-names: Nguyen
+        given-names: Tien N.
+    year: 2020
+    conference:
+      name: "MSR 2020"
+    doi: 10.1145/3379597.3387501
+  - type: conference-paper
+    title: "DiverseVul: A New Vulnerable Source Code Dataset for Deep Learning Based Vulnerability Detection"
+    authors:
+      - family-names: Chen
+        given-names: Yizheng
+      - family-names: Ding
+        given-names: Zhoujie
+      - family-names: Alowain
+        given-names: Lamya
+      - family-names: Chen
+        given-names: Xinyun
+      - family-names: Wagner
+        given-names: David
+    year: 2023
+    conference:
+      name: "RAID 2023"
+    doi: 10.1145/3607199.3607242
+  - type: conference-paper
+    title: "Vulnerability Detection with Code Language Models: How Far Are We?"
+    authors:
+      - family-names: Ding
+        given-names: Yangruibo
+      - family-names: Fu
+        given-names: Yanjun
+      - family-names: Ibrahim
+        given-names: Omniyyah
+      - family-names: Sitawarin
+        given-names: Chawin
+      - family-names: Chen
+        given-names: Xinyun
+      - family-names: Alomair
+        given-names: Basel
+      - family-names: Wagner
+        given-names: David
+      - family-names: Ray
+        given-names: Baishakhi
+      - family-names: Chen
+        given-names: Yizheng
+    year: 2025
+    conference:
+      name: "ICSE 2025"
+    url: "https://arxiv.org/abs/2403.18624"
+  - type: conference-paper
+    title: "MegaVul: A C/C++ Vulnerability Dataset with Comprehensive Code Representations"
+    authors:
+      - family-names: Ni
+        given-names: Chao
+      - family-names: Shen
+        given-names: Liyu
+      - family-names: Yang
+        given-names: Xiaohu
+      - family-names: Zhu
+        given-names: Yan
+      - family-names: Wang
+        given-names: Shaohua
+    year: 2024
+    conference:
+      name: "MSR 2024"
+    doi: 10.1145/3643991.3644886

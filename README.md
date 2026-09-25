@@ -109,28 +109,105 @@ If you use it elsewhere, adapt the parameter table in `SKILL.md` §10 and the tw
 | `references/primevul_outcome_taxonomy.py` | The single source of truth for the four outcomes and every secondary-field value, with the meaning and next action of each value | When classifying a sample or reporting counts by secondary field |
 | `references/SOURCE.json` | Origin path and sha256 of each Chinese original the references were translated from | When checking whether a copy is stale |
 
-### External references the manual relies on
+### External references and citations
 
 Datasets whose labels the skill verifies:
 
-- BigVul: J. Fan, Y. Li, S. Wang, T. N. Nguyen. "A C/C++ Code Vulnerability Dataset with Code Changes and CVE Summaries." MSR 2020.
-- PrimeVul: Y. Ding et al. "Vulnerability Detection with Code Language Models: How Far Are We?" ICSE 2025.
-- MegaVul: C. Ni et al. "MegaVul: A C/C++ Vulnerability Dataset with Comprehensive Code Representations." MSR 2024.
-- DiverseVul: Y. Chen et al. "DiverseVul: A New Vulnerable Source Code Dataset for Deep Learning Based Vulnerability Detection." RAID 2023.
+- BigVul: Jiahao Fan, Yi Li, Shaohua Wang, Tien N. Nguyen. "A C/C++ Code Vulnerability Dataset with Code Changes and CVE Summaries." MSR 2020. https://doi.org/10.1145/3379597.3387501
+- DiverseVul: Yizheng Chen, Zhoujie Ding, Lamya Alowain, Xinyun Chen, David Wagner. "DiverseVul: A New Vulnerable Source Code Dataset for Deep Learning Based Vulnerability Detection." RAID 2023. https://doi.org/10.1145/3607199.3607242
+- PrimeVul: Yangruibo Ding, Yanjun Fu, Omniyyah Ibrahim, Chawin Sitawarin, Xinyun Chen, Basel Alomair, David Wagner, Baishakhi Ray, Yizheng Chen. "Vulnerability Detection with Code Language Models: How Far Are We?" ICSE 2025. https://arxiv.org/abs/2403.18624
+- MegaVul: Chao Ni, Liyu Shen, Xiaohu Yang, Yan Zhu, Shaohua Wang. "MegaVul: A C/C++ Vulnerability Dataset with Comprehensive Code Representations." MSR 2024. https://doi.org/10.1145/3643991.3644886
 
-Tools and oracles named in the criteria:
+Dynamic tools and oracles named in the criteria:
 
-- AddressSanitizer, MemorySanitizer, UndefinedBehaviorSanitizer, ThreadSanitizer and LeakSanitizer (LLVM/GCC sanitizer documentation, https://clang.llvm.org/docs/). The manual's rule that MSan and TSan print `WARNING:` rather than `ERROR:` and that UBSan prints `<file>:<line>:<col>: runtime error:` comes from their output formats.
-- Valgrind Memcheck (https://valgrind.org/docs/manual/mc-manual.html), used where ASan structurally cannot see a defect class (uninitialized reads, information leaks).
-- gdb breakpoint hit counts and gcov line coverage, used as execution proof down to the patched lines.
-- ARVO (reproducible OSS-Fuzz vulnerabilities, https://github.com/n132/ARVO) for exact-commit reproduction where a BigVul fix commit coincides with an ARVO record.
-- The "Table 7" failure types referenced by the manual-check protocol (Mock, Invalid Test, none) follow the failure taxonomy used by the CVE-Factory reproduction study cited in the source repository's manual-check reports.
+- AddressSanitizer: Konstantin Serebryany, Derek Bruening, Alexander Potapenko, Dmitry Vyukov. "AddressSanitizer: A Fast Address Sanity Checker." USENIX ATC 2012. https://www.usenix.org/conference/atc12/technical-sessions/presentation/serebryany
+- MemorySanitizer: Evgeniy Stepanov, Konstantin Serebryany. "MemorySanitizer: Fast Detector of Uninitialized Memory Use in C++." CGO 2015. https://doi.org/10.1109/CGO.2015.7054186
+- UndefinedBehaviorSanitizer, ThreadSanitizer, LeakSanitizer: LLVM sanitizer documentation, https://clang.llvm.org/docs/ (the manual's rules that MSan and TSan print `WARNING:` rather than `ERROR:`, and that UBSan prints `<file>:<line>:<col>: runtime error:`, follow these tools' output formats).
+- Valgrind Memcheck: Nicholas Nethercote, Julian Seward. "Valgrind: A Framework for Heavyweight Dynamic Binary Instrumentation." PLDI 2007. https://doi.org/10.1145/1250734.1250746
+- ARVO: Xiang Mei, Pulkit Singh Singaria, Jordi Del Castillo, Haoran Xi, Abdelouahab Benchikh, Tiffany Bao, Ruoyu Wang, Yan Shoshitaishvili, Adam Doupé, Hammond Pearce, Brendan Dolan-Gavitt. "ARVO: Atlas of Reproducible Vulnerabilities for Open Source Software." arXiv:2408.02153, 2024. https://arxiv.org/abs/2408.02153 (used for exact-commit reproduction where a BigVul fix commit coincides with an ARVO record).
+- gdb breakpoint hit counts and gcov line coverage (GNU toolchain documentation) are used as execution proof down to the patched lines.
+- The failure types "Mock", "Invalid Test" and "none" used by the manual-check protocol follow the failure taxonomy (Table 7) of the CVE-Factory reproduction study referenced in the source repository's manual-check reports.
 
 Skill format and hosts:
 
 - Agent Skills specification: https://agentskills.io
 - Claude Code skills: https://docs.claude.com/en/docs/claude-code/skills
 - OpenAI Codex skills: https://developers.openai.com/codex/skills
+
+### BibTeX
+
+```bibtex
+@inproceedings{fan2020bigvul,
+  title     = {A C/C++ Code Vulnerability Dataset with Code Changes and CVE Summaries},
+  author    = {Fan, Jiahao and Li, Yi and Wang, Shaohua and Nguyen, Tien N.},
+  booktitle = {Proceedings of the 17th International Conference on Mining Software Repositories (MSR)},
+  year      = {2020},
+  doi       = {10.1145/3379597.3387501}
+}
+@inproceedings{chen2023diversevul,
+  title     = {DiverseVul: A New Vulnerable Source Code Dataset for Deep Learning Based Vulnerability Detection},
+  author    = {Chen, Yizheng and Ding, Zhoujie and Alowain, Lamya and Chen, Xinyun and Wagner, David},
+  booktitle = {Proceedings of the 26th International Symposium on Research in Attacks, Intrusions and Defenses (RAID)},
+  year      = {2023},
+  doi       = {10.1145/3607199.3607242}
+}
+@inproceedings{ding2025primevul,
+  title     = {Vulnerability Detection with Code Language Models: How Far Are We?},
+  author    = {Ding, Yangruibo and Fu, Yanjun and Ibrahim, Omniyyah and Sitawarin, Chawin and Chen, Xinyun and Alomair, Basel and Wagner, David and Ray, Baishakhi and Chen, Yizheng},
+  booktitle = {Proceedings of the 47th IEEE/ACM International Conference on Software Engineering (ICSE)},
+  year      = {2025},
+  eprint    = {2403.18624},
+  archivePrefix = {arXiv}
+}
+@inproceedings{ni2024megavul,
+  title     = {MegaVul: A C/C++ Vulnerability Dataset with Comprehensive Code Representations},
+  author    = {Ni, Chao and Shen, Liyu and Yang, Xiaohu and Zhu, Yan and Wang, Shaohua},
+  booktitle = {Proceedings of the 21st International Conference on Mining Software Repositories (MSR)},
+  year      = {2024},
+  doi       = {10.1145/3643991.3644886}
+}
+@inproceedings{serebryany2012asan,
+  title     = {{AddressSanitizer}: A Fast Address Sanity Checker},
+  author    = {Serebryany, Konstantin and Bruening, Derek and Potapenko, Alexander and Vyukov, Dmitry},
+  booktitle = {USENIX Annual Technical Conference (USENIX ATC)},
+  year      = {2012}
+}
+@inproceedings{stepanov2015msan,
+  title     = {{MemorySanitizer}: Fast Detector of Uninitialized Memory Use in C++},
+  author    = {Stepanov, Evgeniy and Serebryany, Konstantin},
+  booktitle = {IEEE/ACM International Symposium on Code Generation and Optimization (CGO)},
+  year      = {2015},
+  doi       = {10.1109/CGO.2015.7054186}
+}
+@inproceedings{nethercote2007valgrind,
+  title     = {Valgrind: A Framework for Heavyweight Dynamic Binary Instrumentation},
+  author    = {Nethercote, Nicholas and Seward, Julian},
+  booktitle = {Proceedings of the ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI)},
+  year      = {2007},
+  doi       = {10.1145/1250734.1250746}
+}
+@misc{mei2024arvo,
+  title     = {ARVO: Atlas of Reproducible Vulnerabilities for Open Source Software},
+  author    = {Mei, Xiang and Singaria, Pulkit Singh and Del Castillo, Jordi and Xi, Haoran and Benchikh, Abdelouahab and Bao, Tiffany and Wang, Ruoyu and Shoshitaishvili, Yan and Doup{\'e}, Adam and Pearce, Hammond and Dolan-Gavitt, Brendan},
+  year      = {2024},
+  eprint    = {2408.02153},
+  archivePrefix = {arXiv}
+}
+```
+
+### Citing this skill
+
+```bibtex
+@misc{lzhan011_vuln_label_dynamic_confirmation_2026,
+  title        = {vuln-label-dynamic-confirmation: an Agent Skill for dynamic-tool verification of vulnerability labels},
+  author       = {lzhan011},
+  year         = {2026},
+  howpublished = {\url{https://github.com/lzhan011/vuln-label-dynamic-confirmation-skill}},
+  note         = {MIT License}
+}
+```
+
+A machine-readable `CITATION.cff` is included; GitHub renders it as "Cite this repository".
 
 ## License
 
