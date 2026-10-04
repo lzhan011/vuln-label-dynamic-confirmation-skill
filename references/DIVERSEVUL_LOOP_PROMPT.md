@@ -29,7 +29,7 @@ the denominator **9,604**:
 | Outcome | Meaning | Secondary fields |
 |---|---|---|
 | `CONFIRMED` | The labelled function triggered a real defect on a faithful input | `confirmation_class` (one of three tiers), `confirmation_scope`, `reachability`, `cwe`/`cwe_chain`/`cwe_basis`, `cve_match` (for DiverseVul always `undeterminable`) |
-| `LABEL_NOISE_EXCLUDED` | The label is overturned: attacked with a matching tool and nothing fired while all gates are in place, **or** a differential was measured but its direction is inverted | `label_noise_category`, `label_noise_basis`, `label_noise_type`, `real_vuln_location` |
+| `LABEL_NOISE_EXCLUDED` | The label is overturned: attacked with a matching tool and nothing fired while all gates are in place **and** a source-grounded rejection rationale R is recorded, **or** a differential was measured but its direction is inverted (verify the three things + R first) | `label_noise_category`, `label_noise_basis`, `label_noise_type`, `real_vuln_location` |
 | `DY_Attacked_But_can_not_decide_confirmed_or_label_noise` | **A dynamic tool really did attack it and readings from both sides were obtained, but this measurement cannot decide between confirmation and mislabel** | `dy_attacked_undecided_category` |
 | `BUILD_FAILED` | **Not measured**: cannot be built, cannot be reached, or simply has not been tested yet | `build_failed_reason` |
 
@@ -159,7 +159,7 @@ A compliant negative dynamic-attack record:
 
 | Value | When to write it |
 |---|---|
-| `dynamic_attack_negative` | **Attacked, and nothing fired at all**, with all seven gates passed |
+| `dynamic_attack_negative` | **Attacked, and nothing fired at all**, with all seven gates passed **and** a source-grounded rejection rationale R is recorded |
 | **`dynamic_differential_inverted`** | **A differential was measured and its direction is inverted** — the one that fails is `fixed_function.c`, while `vulnerable_function.c` is clean |
 | `static_reading` | **Only the code was read.** **This does not trigger exclusion**; the sample stays on the worklist waiting to be attacked |
 
@@ -259,7 +259,31 @@ In one sentence: the standard confirmation is that on the same faithful input th
 Product fields must include cve_match, triggered_vuln, synthetic_trigger:false, differential (hv_rc/hf_rc as real integers), mechanism_matches_diff, frame_note where needed, plus label_noise + label_noise_type / needs-Path-B.
 ★ CWE must be written: cwe (an array), cwe_chain (root cause -> sink chain), cwe_basis (the actual observed evidence supporting that judgement, e.g. "ASan heap-buffer-overflow READ size 4, frame#1 vpc_open"). Derive the CWE from the observed mechanism, do not copy it from the commit message; when root cause and sink differ, write it as a chain (e.g. CWE-190 -> CWE-787); when it cannot be decided, write cwe:[] + cwe_basis:"not determinable from observed behaviour". Inventing a CVE is still forbidden; it may only be looked up upstream via commit_id. Add a cwe_chain column to the RUNLOG line.
 
-★★★★★ The label-noise dynamic gate: any static conclusion may only be written as suspected_label_noise + label_noise_basis:"static_reading", does not trigger exclusion, and the sample stays on the worklist. Before a final label_noise:true, seven gates must pass: (1) a real integer exit code + a re-runnable script + non-empty complete logs (2) labelled_fn_executed with proof of execution ("compiled in" does not count) (3) the attack input is not a normal call (4) the oracle chosen matches the observed mechanism (5) attack_surface_note states the entry point / value ranges / duration (6) the stored body checked word for word against upstream (a truncated body = attacking the wrong object, record stored_body_incomplete) (7) proof that execution reached the disputed line of the diff (merely entering the function does not count; a gdb count of 0 must be double-checked with gcov). Evidence goes in <id>/dynamic_evidence/label_noise_attack/; without the evidence directory the ruling is void. For inverted polarity write label_noise_basis:"dynamic_differential_inverted", never dynamic_attack_negative.
+★★★★★ The label-noise dynamic gate: any static conclusion may only be written as suspected_label_noise + label_noise_basis:"static_reading", does not trigger exclusion, and the sample stays on the worklist. Before a final label_noise:true, seven gates must pass: (1) a real integer exit code + a re-runnable script + non-empty complete logs (2) labelled_fn_executed with proof of execution ("compiled in" does not count) (3) the attack input is not a normal call (4) the oracle chosen matches the observed mechanism (5) attack_surface_note states the entry point / value ranges / duration (6) the stored body checked word for word against upstream (a truncated body = attacking the wrong object, record stored_body_incomplete) (7) proof that execution reached the disputed line of the diff (merely entering the function does not count; a gdb count of 0 must be double-checked with gcov). Evidence goes in <id>/dynamic_evidence/label_noise_attack/; without the evidence directory the ruling is void. For inverted polarity write label_noise_basis:"dynamic_differential_inverted", never dynamic_attack_negative. ★ 2026-10-03 (the paper's Method §S6 governs): an inverted direction is not by itself enough to rule exclusion — the source orientation, the source and build bindings and the observed fault itself must be verified and recorded first, and a source-grounded rejection rationale R is required on top, before that basis may be written; without all of that the sample stays DY_Attacked_But_can_not_decide_confirmed_or_label_noise.
+
+**★ 2026-10-03: the seven gates are necessary, not sufficient — a rejection rationale is required too.**
+The governing acceptance condition is the one in the Method section of the VulValidate paper
+(S6 "Label correction", Table `tab:negative`):
+
+    N_corr = (gate 1 AND gate 2 AND ... AND gate 7) AND R
+
+`R` is a **rejection rationale grounded in the source**: an explanation of why the behaviour that
+was exercised rejects the original attribution — for example, an already-present guard that
+correctly handles the challenged condition. **And the attack must actually exercise the condition
+that `R` addresses**; an attack that never reaches that condition does not support `R`, however
+many gates it passes. Record `R` in the sample's record alongside the gates.
+
+**Search exhaustion on its own does not count, and equal behaviour on the two sides on its own
+does not count either** — without `R` the sample stays
+`DY_Attacked_But_can_not_decide_confirmed_or_label_noise` and may not be moved to exclusion.
+
+**An apparent inverted differential is the same.** "The pre-fix side is clean while the post-fix
+side faults" needs three things verified and recorded first — the **source orientation** (which
+revision really is the parent of the fix commit), the **source and build bindings** (that each
+side was built from the revision it claims), and **the observed fault itself** — and then this
+same `R`, before `label_noise_basis: "dynamic_differential_inverted"` may be written, because a
+witness on the post-fix side speaks only about that side's code.
+
 
 ★★★★★ Every CONFIRMED must fill in confirmation_scope:defect_site|reachability and reachability:REACHABLE|UNREACHABLE|UNKNOWN. Judge scope by the actual shape of the stack: fault inside the labelled function's body at frame#0 → defect_site; in a function it really calls → reachability + a defect_site object + call_path; in a caller or in a sibling with no call relationship → fault_not_attributable. When both sides fault the same way but a real defect inside the labelled function's call closure can be triggered faithfully, record OTHER_DEFECT_UNFIXED and do not reject it for lack of a differential.
 

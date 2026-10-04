@@ -9,7 +9,7 @@
 
 Source of truth for the statistics: `primevul_dynamic_status_latest.json`. The original `target=1` denominator is **6,004**. **The four outcomes**: `CONFIRMED` **5,549**; `LABEL_NOISE_EXCLUDED` **81**; `DY_Attacked_But_can_not_decide_confirmed_or_label_noise` **368** (attacked, readings obtained on both sides, but this measurement cannot decide between confirmation and mislabel; breakdown in `dy_attacked_undecided_category`); `BUILD_FAILED` **6** (**never measured**, breakdown in `build_failed_reason`).
 
-For label noise there is only one number: `LABEL_NOISE_EXCLUDED` **81** (attacked, all seven gates passed, no fault fired). Separately there is a static triage ledger of **224** rows waiting to be attacked; they have no effect whatsoever on the partition above. The historical narrative is kept in the rest of this file and is not the current count.
+For label noise there is only one number: `LABEL_NOISE_EXCLUDED` **81** (attacked, all seven gates passed **and** a source-grounded rejection rationale R is recorded, no fault fired). Separately there is a static triage ledger of **224** rows waiting to be attacked; they have no effect whatsoever on the partition above. The historical narrative is kept in the rest of this file and is not the current count.
 
 Whether a dynamic tool really ran (a stricter criterion than whether an artifact exists, from `primevul_dynamic_untested.json`): never run by any dynamic tool **19**, of which not in the confirmation registry and still on the to-do list **2**, and registered as CONFIRMED but with no actual run trace on disk **17**; fully meeting the "done" standard of Section 2 of this document **3,014**. The active pending list `primevul_pending_worklist.jsonl` holds **367** samples in total.
 <!-- CURRENT-SNAPSHOT-END -->
@@ -135,7 +135,7 @@ For each sample, first read the CVE, the fix diff of commit_id, the upstream sou
 
 Run both sides with the same input, the same driver, the same compile flags and the same environment; the only variable may be the pre-fix versus post-fix body of the labelled function. Record the real integer vuln_rc/fix_rc, the full output, and proof that the labelled function really executed and that the patch's disputed lines were hit. A fault on the pre-fix side with the fixed side clean is a standard confirmation; triggering another real defect of the labelled function is still a confirmation but write cve_match:false; both sides faulting with the defect entered from the labelled function can still be confirmed as OTHER_DEFECT_UNFIXED; the sample side clean with the fixed side faulting cannot be confirmed.
 
-Before deciding label noise, you must really attack the labelled function with a dynamic tool suited to the CWE and with attack inputs. Static inspection.json, primevul_label_noise.jsonl, diff -w, the commit title, or a sibling function already confirmed can only produce suspected_label_noise, and cannot exclude a sample. Only after attacking with all seven gates passed and still no trigger may you write label_noise:true + label_noise_type:label_noise_dynamic_tools_attacked + label_noise_basis:dynamic_attack_negative, and put the complete attack evidence into <id>/dynamic_evidence/label_noise_attack/. needs-Path-B and a negative dynamic attack are strictly separate.
+Before deciding label noise, you must really attack the labelled function with a dynamic tool suited to the CWE and with attack inputs. Static inspection.json, primevul_label_noise.jsonl, diff -w, the commit title, or a sibling function already confirmed can only produce suspected_label_noise, and cannot exclude a sample. Only after attacking with all seven gates passed **and** a source-grounded rejection rationale R is recorded and still no trigger may you write label_noise:true + label_noise_type:label_noise_dynamic_tools_attacked + label_noise_basis:dynamic_attack_negative, and put the complete attack evidence into <id>/dynamic_evidence/label_noise_attack/. needs-Path-B and a negative dynamic attack are strictly separate.
 
 All reproducible files go into data/output/dataset/primevul/<id>/dynamic_evidence/: repro.sh, driver/harness, body_vuln.inc, body_fix.inc, the PoC input, the full logs of both sides named after the oracle, and EVIDENCE_MAP.json. Scripts must not write to /tmp, ~, directories outside the repository, or hard-code absolute paths. Shared source and builds stay inside the repository under pathb/, pinned by git remote, exact commit, dirty diff and build flags. Paths in records are written relative to the sample directory, like dynamic_evidence/repro.sh.
 
@@ -245,7 +245,7 @@ and the four numbers add up to the denominator 6,004:
 | Outcome | Meaning | Secondary field |
 |---|---|---|
 | `CONFIRMED` | the labelled function triggered a real defect under a faithful input | `confirmation_class` (one of three), `cve_match` (true/false), `confirmation_scope` (`defect_site`/`reachability`), `reachability` (`REACHABLE`/`UNREACHABLE`/`UNKNOWN`) |
-| `LABEL_NOISE_EXCLUDED` | the label is overturned: **either** it was attacked with a tool matched to the CWE, nothing triggered, and all seven gates are in place, **or** a differential was measured whose direction is inverted | `label_noise_category` (vocabulary in Section 7), `label_noise_basis` (`dynamic_attack_negative` or `dynamic_differential_inverted`), `label_noise_type`; write `n/a` for `cve_match` |
+| `LABEL_NOISE_EXCLUDED` | the label is overturned: **either** it was attacked with a tool matched to the CWE, nothing triggered, and all seven gates are in place **and** a source-grounded rejection rationale R is recorded, **or** a differential was measured whose direction is inverted (verify the three things + R first) | `label_noise_category` (vocabulary in Section 7), `label_noise_basis` (`dynamic_attack_negative` or `dynamic_differential_inverted`), `label_noise_type`; write `n/a` for `cve_match` |
 | `DY_Attacked_But_can_not_decide_confirmed_or_label_noise` | **really attacked with a dynamic tool, readings obtained on both sides, but this measurement cannot decide whether it is a confirmation or a mislabel** | `dy_attacked_undecided_category`, see the table below |
 | `BUILD_FAILED` | **never measured**: could not be built, could not be reached, or simply has not been tested yet | `build_failed_reason`, see the table below |
 
@@ -387,7 +387,7 @@ Statistically it goes into `BUILD_FAILED`, meaning "after several attempts it st
 
 **This state is the real "tested many times with no result".** But note where it goes:
 
-- **all seven gates passed** -> it should not stop here; per Section 7 write `label_noise: true` +
+- **all seven gates passed **and** a source-grounded rejection rationale R is recorded** -> it should not stop here; per Section 7 write `label_noise: true` +
   `label_noise_basis: "dynamic_attack_negative"`, and move it into `LABEL_NOISE`;
 - **any gate missing** -> stay in `attack_exhausted`, write down which gate is missing, and the sample **stays on the to-do list**.
 
@@ -593,6 +593,30 @@ that "condition" is not what the fix is handling, so it fails the first question
 
 ## 7. A dynamic attack is required before deciding label noise: the seven gates
 
+**★ 2026-10-03: the seven gates are necessary, not sufficient — a rejection rationale is required too.**
+The governing acceptance condition is the one in the Method section of the VulValidate paper
+(S6 "Label correction", Table `tab:negative`):
+
+    N_corr = (gate 1 AND gate 2 AND ... AND gate 7) AND R
+
+`R` is a **rejection rationale grounded in the source**: an explanation of why the behaviour that
+was exercised rejects the original attribution — for example, an already-present guard that
+correctly handles the challenged condition. **And the attack must actually exercise the condition
+that `R` addresses**; an attack that never reaches that condition does not support `R`, however
+many gates it passes. Record `R` in the sample's record alongside the gates.
+
+**Search exhaustion on its own does not count, and equal behaviour on the two sides on its own
+does not count either** — without `R` the sample stays
+`DY_Attacked_But_can_not_decide_confirmed_or_label_noise` and may not be moved to exclusion.
+
+**An apparent inverted differential is the same.** "The pre-fix side is clean while the post-fix
+side faults" needs three things verified and recorded first — the **source orientation** (which
+revision really is the parent of the fix commit), the **source and build bindings** (that each
+side was built from the revision it claims), and **the observed fault itself** — and then this
+same `R`, before `label_noise_basis: "dynamic_differential_inverted"` may be written, because a
+witness on the post-fix side speaks only about that side's code.
+
+
 PrimeVul's `inspection.json` and `primevul_label_noise.jsonl` are static triage and are uniformly downgraded to
 `suspected_label_noise`. None of the following can settle the case on its own:
 
@@ -642,7 +666,7 @@ A compliant negative dynamic-attack record:
 
 | Value | When to write it |
 |---|---|
-| `dynamic_attack_negative` | **attacked, and nothing fired**, with all seven gates passed |
+| `dynamic_attack_negative` | **attacked, and nothing fired**, with all seven gates passed **and** a source-grounded rejection rationale R is recorded |
 | **`dynamic_differential_inverted`** | **a differential was measured, and its direction is inverted** -- the one that goes wrong is the build from the **fixed** code, while the build from the **pre-fix** code is clean (added by the user 2026-08-17) |
 | `static_reading` | **only the code was read**. **This does not trigger an exclusion**; the sample stays on the to-do list waiting to be attacked |
 
@@ -983,7 +1007,7 @@ The campaign stops only when all of the following hold at once:
 
 - every active target=1 sample has a real `tried_dynamic_method` and a real two-sided `differential`, or a legal structural exception that was actually measured and
   whose evidence is complete;
-- every still-effective ID in the static `primevul_label_noise.jsonl` already has a dynamic attack with all seven gates in place,
+- every still-effective ID in the static `primevul_label_noise.jsonl` already has a dynamic attack with all seven gates in place **and** a source-grounded rejection rationale R is recorded,
   or is still on the active list; none may vanish through a default exclusion;
 - for each handled sample, the script, the input, the source of both sides, the full logs and `EVIDENCE_MAP.json` are all inside the sample directory and rerunnable;
 - `dynamic_confirmation.json`, the craft file, info and the registry all agree;
